@@ -1,0 +1,361 @@
+﻿# install package
+conda install elasticsearch
+sudo conda install elasticsearch    # run elevated, not recommend
+conda list
+# Create new environment based on "base" and then install packages
+# "base" contains basic & pip
+
+# short cut for Jupyter notebook
+# "Shift + Enter" or "Alt + Enter"
+# "Shift" + Tab" for showing document of a function
+
+# Anaconda virtual environments
+https://conda.io/docs/user-guide/tasks/manage-environments.html
+
+>> conda info --envs    # list out all environments
+>> conda create --name my_env
+>> conda create --name my_python1 numpy
+>> conda create --name my_python_env python = 3.5 numpy
+>> activate my_virtual_environment
+(my_virtual_environment) >>
+>> deactivate
+
+>> conda env create -f my_environment.yaml -n my_env
+>> source activate my_env
+(my_env) >> which pip
+(my_env) >> conda install mypackage
+(my_env) >> conda env export > my_new_virtual_environment
+>> source deactivate
+>> conda env remove -n my_env
+
+# Python data types: int, float, string
+
+# return remainder of division
+10%3
+
+# print formatting
+my_string = "I can't go"
+print("{} at {}".format(my_string, 10))
+print("{my_parm1} at {my_parm2}".format(my_parm1 = my_string, my_parm2 = 10))
+
+"""
+methods for string
+	.lower()
+	.upper()
+	.split()
+"""
+
+my_nested_list = [1, 2, ["three", 4]]
+
+"""
+methods for a list object
+    .append()
+    .pop()    # pop item of a list & change is permanent
+"""
+
+my_dict = {"hash_table_key": "hash_table_key_value", "key": [7, 8, 9]}
+
+"""
+dictionary has key/pair values
+    .keys()
+    .values()
+    .items()
+"""
+
+# boolean: True / False
+
+my_tuple = (1,2,3,4,4)    # tuple is immutable and can not accept item assignment
+
+my_set = {1, 2, 3, 3}
+
+"""
+set: collection of unique elements
+    .add()
+"""
+
+# operators: ==, !=, and, or, in
+
+3 in [1,2,3]    # True
+3 in my_set
+
+# index in Python starts from 0
+
+# list comprehension
+[my_function(value) for value in range(1,5)]
+# list comprehension (if treatment 1 else treatment 2)
+[my_func(rec) if i_count in list_position else func_diff for i_count, rec in enumerate(data)]
+[my_func(rec) for i_count, rec in enumerate(data) if i_count in list_position]
+# apply function only when i isn't part of element in list
+[mylist.remove(i) for i in mylist if i not in mylist_check]
+# apply function only in certain position specified in position_list
+[myfunc(record_line) if i in position_list else record_line for i, value in enumerate(record_line)]
+
+# map function, lambda expression, & filter function
+list(map(my_func, my_list))
+list(map(lambda my_input: my_input*2, my_list))    # use lambda function instead of defining completely a full function
+list(filter(lambda my_input: my_input%2 == 0, my_list))    # filter out for even numbers 
+
+# zip
+list(zip(my_list1, my_list2))    # zip lists to tuple pairs 
+
+# tuple unpacking
+my_list_of_tuples = [(1,2),(3,4),(5,6)]
+print("First element of each tuple")
+for e1, e2 in my_list_of_tuples:
+    print(e1)
+
+my_index_and_value = list(enumerate(my_list))
+
+""" ##################
+if myCondition:
+    myActions
+elif myCondition:
+    myActions
+else:
+    myActions
+################## """
+
+""" ##################
+for myCount in range(10):
+    print(myCount)
+################## """
+
+""" ##################
+i = 1
+
+while i < 5:
+    print("i is {}".format(i))
+    i = i + 1
+
+print(i)
+################## """
+
+""" ##################
+def my_func(my_param="default value"):
+    """
+    this is a docstring
+    """
+    return my_param
+################## """
+
+# my_func : <function __main__.my_func>
+# Ask Python what's this object? That's an object, an main function called my_func
+
+# Numpy array (1-D vector / 2-D matrix)
+import numpy as np
+my_list = [1,2,3]
+my_array = np.array(my_list)    # create array using a Python object - list
+my_matrix = np.array([[10,11,12],[13,14,15],[16,17,18],[19,20,21]])
+
+np.arange(25)
+np.arange(0,9,2)
+np.zeros((3,2))    # tuple(row,column)
+np.ones(10)
+np.linspace(0,10,3)
+np.eye(3)    # identity matrix
+
+np.random.rand(4)    # from uniform distribution from 0 to 1
+np.random.rand(2,2)
+np.random.randn(5)    # standard normal distrbution center at 0
+np.random.randint(5,10,2)    # a random number from inclusive lower bound to exclusive upper bound
+
+# attribute & method
+my_array = np.arange(25)
+my_array.reshape(5,5)    # re-shape method
+my_array.dtype
+random_array = np.random.randint(0,50,10)
+random_array.max()    # max method
+random_array.min()
+random_array.argmin()    # return index location of min value
+random_array.reshape(2,5).shape
+
+from numpy.random import randint    # simplify typing
+randint(2,10)    # versus typing np.random.randint(2,10)
+
+"""
+NumPy arrary is different from list and it can broadcast
+Changes will be in original array!
+Check example below
+"""
+
+import numpy as np
+my_array = np.arange(10)
+print(my_array)
+slice_of_my_array = my_array[0:3]
+slice_of_my_array[:] = 100
+print(slice_of_my_array)
+print(my_array)    # value of my_array is changed too!
+
+# to avoid the above situation, use copy method to copy an array
+copy = my_array.copy()
+
+# slicing
+# my_2d_arr[i,j] is equivalent to my_2d_arr[i][j]; i is row, and j is column
+
+# conditional selection
+my_array = np.arange(10)
+my_array[my_array > 5]
+
+# NumPy operations: +, -, *, /
+# inf (1/0) & nan (0/0)
+my_array/my_array
+1/my_array
+
+"""
+np.sqrt(my_array)
+    .exp()
+    .max()
+    .sin()
+    .log()
+"""
+
+# pandas; data types: Series (index by label), DataFrame
+# pandas.core.series.Series, pandas.core.frame.DataFrame 
+# Series can hold a variety of object types
+# NaN
+import numpy as np
+import pandas as pd
+my_list_label = ['a','b','c']
+my_list = [10,20,30]
+my_array = np.array(my_list)
+my_dict = {'a':10,'b':20,'c':30}
+pd.Series(data = my_list, index = my_list_label)
+my_pd_Series = pd.Series(my_array, my_list_label)
+pd.Series(my_dict)
+type(my_pd_Series)
+my_pd_Series.dtype
+
+my_pd_Series1 = pd.Series([1,2,3,4],["US","Germany","USSR","Japan"])
+my_pd_Series2 = pd.Series([10,20,30,40],["US","Germany","Italy", "Japan"])
+my_pd_Series1["US"]
+my_pd_Series2[0]
+my_sum = my_pd_Series1 + my_pd_Series2
+print(my_sum)
+
+np.random.seed(101)
+df = pd.DataFrame(np.random.randn(5,4),['A','B','C','D','E'],['W','X','Y','Z'])
+type(df)
+df[['X','Z']]    # pass a list of column names
+df['New'] = df['X'] + df['Y']
+df.loc["E"]
+df.iloc[0]
+type(df.loc['A'])
+df.loc[['B','C'],['W','Y']]
+
+df.shape    # index 0 is row, index 1 is column
+df.drop("New", axis = 1)    # inplace = True/False avoid accidentally lose data
+df.drop("E")
+
+# MultiIndex
+outside = ['G1','G1','G1','G2','G2','G2']
+inside = [1,2,3,1,2,3]
+hier_index = list(zip(outside,inside))
+pd.MultiIndex.from_tuples(hier_index)
+np.random.seed(101)
+df = pd.DataFrame(np.random.randn(6,2), hier_index, ["A","B"])
+
+# missing data
+# pandas missing data, null or NaN
+my_dict = {'ColumnA':[1,2,np.nan],'ColumnB':[5,np.nan,np.nan],'ColumnC':[1,2,3]}
+df = pd.DataFrame(my_dict)
+
+df.dropna()    # drop rows which have one or more missing values
+df.dropna(axis = 1)    # drop columns which have one or more missing values
+df.dropna(thresh = 2)    # drop rows which have less than two elements have values
+
+df.fillna(value="Fill values")
+df["ColumnA"].fillna(value=df["ColumnA"].mean())
+
+# groupby
+dict_data = {'Company':['A','A','B','B','B','C','C','C','C'],
+       'Name':['AA1','AA2','BB1','BB2','BB3','CC1','CC2','CC3','CC4'],
+       'Number':[100,300,500,700,900,250,150,350,50]}
+df = pd.DataFrame(dict_data)
+df.groupby('Company').mean().loc['B']
+df.groupby('Company').describe().transpose()['C']
+
+# concatenate/merge/join
+pd.concat([df1,df2], axis = 1)
+pd.merge(left, right, how = "inner", on = "key")    # left, right, inner, outer
+left.join(right, how = "left")
+
+# operations
+df['col2'].unique()
+df['col2'].nunique()    # number of unique values
+df['col2'].value_counts()
+
+df[(df['col1'] > 2) & (df['col2'] == 444)]    # cannot use "and"
+
+def my_func(x):
+    return x*2
+df['col1'].apply(my_func)
+df['col1'].apply(lambda x: x*2)
+
+df.drop('col1', axis = 1)
+df.columns
+df.index
+df.isnull()
+df.pivot_table(values = 'D', index = ['A','B'], columns = 'C')
+
+# I/O
+pandas.read_*
+my_df.to_*
+
+# SQL
+PostgreSQL: psycopg2
+MySQL: PyMySql
+SQLLite:
+
+
+# matplotlib 
+# https://matplotlib.org/
+import matplotlib.pyplot as plt
+%matplotlib inline
+# for running on jupyter notebook
+
+#import numpy as np
+x = np.linspace(0,5,11)
+y= x**2
+
+# functional method
+plt.subplot(1,2,1)
+plt.plot(x, y, 'r-')
+plt.xlabel('x label')
+plt.title('title')
+plt.subplot(1,2,2)
+plt.plot(x, y, 'b+')
+
+# object-oriented method
+fig = plt.figure()    # create figure object
+axes1 = fig.add_axes([0.1,0.1,0.8,0.8])    # call method to add axes
+axes2 = fig.add_axes([0.2,0.5,0.4,0.3])
+axes1.plot(x,y)
+axes1.set_xlabel('x label')
+axes1.set_ylabel('y label')
+axes1.set_title('title')
+axes2.plot(y, x, 'r-')
+
+
+
+
+######## encode & decode ########
+with open("data_encode_latin1.csv", "rt", encoding = "latin1") as data:
+    for line in data:
+        print("print data from file:", line)
+        
+        line_new = line.rstrip().split(",")
+        print("print data after .split():", line_new)
+        print("print the 2nd element and its type:", line_new[1], type(line_new[1]))
+        
+        line_new_encode = line_new[1].encode("utf8")
+        print("print result of encoding and its type:", line_new_encode, type(line_new_encode))
+        
+        line_new_encode_decode = line_new_encode.decode("utf8")
+        print("print result of decoding and its type:", line_new_encode_decode, type(line_new_encode_decode))
+######## results ########
+print data from file: 1,DÝYARBAKIR
+print data after .split(): ['1', 'DÝYARBAKIR']
+print the 2nd element and its type: DÝYARBAKIR <class 'str'>
+print result of encoding and its type: b'D\xc3\x9dYARBAKIR' <class 'bytes'>
+print result of decoding and its type: DÝYARBAKIR <class 'str'>
+######## encode & decode ########
