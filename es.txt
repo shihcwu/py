@@ -17,6 +17,7 @@
 # POST: The POST method is used to submit an entity to the specified resource, often causing a change in state or side effects on the server.
 # PUT: The PUT method replaces all current representations of the target resource with the request payload.
 # HTTP verb: GET, POST, PUT, DELETE
+
 # <REST verb>/<Index>/<Type>/<API>     # <Type> will be removed in later/newer version of Elasticsearch
 
 # create an index
@@ -165,7 +166,7 @@ PUT /<my_index_name>/_doc/_mapping
 # analyzer contains 1. character filter, 2. tokenizer, and 3. token filter
 # character filter: manipulate text before tokenization; HTML strip character filter, mapping character filter, pattern replace
 # tokenizer: split text into terms; word oriented tokenizers (standard, letter, lowercase, whitespace, UAX URL Email), partial work tokenizers (N-Gram, Edge N-Gram), structured text tokenizers (keyword, pattern, path)
-# token filter: manipulate terms before adding them to an inverted index; standard, lowercase, uppercase, NGram, Edge NGram, stop, word delimiter, stemmer (flew -> fly), keyword marker, snowball, synonym, ASCII folding (résumé -> resume))
+# token filter: manipulate terms before adding them to an inverted index; standard, lowercase, uppercase, NGram, Edge NGram, stop, word delimiter, stemmer (going -> go), keyword marker, snowball, synonym, ASCII folding (résumé -> resume))
 # built-in analyzer: standard, simple, stop, language, keyword, pattern, whitespace
 
 # analyze API
@@ -320,4 +321,305 @@ GET /<my_index_name>/_doc/_id/_explain
       "my_field": "my_value"
     }
   }
+}
+
+# query context affects relevance; filter context doesn't
+
+# full-text queries
+# term queries (enum, numbers, dates, etc..)
+
+############### term queries ###############
+GET /<my_index_name>/_doc/_search
+{
+    "query": {
+        "term": {
+            "my_field": {
+                "value": false
+            }
+        }
+    }
+}
+
+# search for multiple terms
+GET /<my_index_name>/_doc/_search
+{
+    "query": {
+        "terms": {
+            "my_field.keyword": [
+                    true, 
+                    false
+                ]
+        }
+    }
+}
+
+# note: term/terms
+
+# retrieve documents based on IDs
+GET /<my_index_name>/_doc/_search
+{
+    "query": {
+        "terms": {
+            "_id": ["1", "2", "3"]
+        }
+    }
+}
+
+# use range query for number or date
+# example: date math & round time
+#     2 year and one day before and round date to month
+#     round current time to month and substract a year
+GET /<my_index_name>/_doc/_search
+{
+    "query": {
+        "range": {
+            "my_field": {
+                "gte": "01-01-2013||-2y-1d/M",
+                "lte": "now/M-1y",
+                "format": "dd-MM-yyyy"
+            }
+        }
+    }
+}
+
+# match document with non-null value
+GET /<my_index_name>/_doc/_search
+{
+    "query": {
+        "exists": {
+            "field": "my_field"
+        }
+    }
+}
+
+# match based on prefix
+GET /<my_index_name>/_doc/_search
+{
+    "query": {
+        "prefix": {
+            "my_field.keyword": "veget"
+        }
+    }
+}
+
+# search with wildcards (performance is slow)
+# *: match any characters sequence including no characters
+#    "vege*able": start with vege and end with able
+# ?: match any single character
+#    "vege?able"
+GET /<my_index_name>/_doc/_search
+{
+    "query": {
+        "wildcard": {
+            "my_field.keyword": "vege*able"
+        }
+
+    }
+}
+
+# search with regular expressions
+# Elasticsearch uses Lucene regular expression engine
+GET /<my_index_name>/_doc/_search
+{
+    "query": {
+        "regexp": {
+            "my_field.keyword": "veget[a-zA-Z]+ble"
+        }
+
+    }
+}
+
+############### term queries ###############
+
+########## full text queries ##########
+# match query operates on terms
+
+GET /<my_index_name>/_doc/_search
+{
+    "query": {
+        "match": {
+            "my_field": {
+                "query": "my_value",
+                "operator": "and"
+            }
+        }
+    }
+}
+
+# terms in specific order
+GET /<my_index_name>/_doc/_search
+{
+    "query": {
+        "match_phrase": {
+            "my_field": "my_value"
+        }
+    }
+}
+
+# search multiple fields
+GET /<my_index_name>/_doc/_search
+{
+    "query": {
+        "multi_match": {
+            "query": "my_value",
+            "fields": ["my_field_1", "my_field_2"]
+        }
+    }
+}
+
+########## full text queries ##########
+
+# compound queries
+GET /<my_index_name>/_doc/_search
+{
+    "query": {
+        "bool": {
+            "must": [
+                {
+                    "match": {
+                        "my_field_1": "my_value"
+                    }
+                },
+                {
+                    "range": {
+                        "my_field_2": {
+                            "lte": 15
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+
+# move range query to filter object to improve efficiency
+# if there is a match for "should", score will be boosted
+# if there is a "must", "should" is optional and having a match for "should" will boost score.
+# if only has "should" for example no "must", then records have to match "should" and "should" becomes required.
+
+GET /<my_index_name>/_doc/_search
+{
+    "query": {
+        "bool": {
+            "must": [
+                {
+                    "match": {
+                        "my_field_1": "my_value"
+                    }
+                }
+            ],
+            "must_not": [
+                {
+                    "match": {
+                        "my_field_1": "my_value_2"
+                    }
+                }
+            ],
+            "should": [
+                {
+                    "match": {
+                        "my_field_1": "my_value_3"
+                    }
+                }
+            ],
+            "filter": [
+                {
+                    "range": {
+                        "my_field_2": {
+                            "lte": 15
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+
+# "matched_queries" will show which my_identifier has a match in results
+# "explain" can help debug ES DSL queries
+GET /<my_index_name>/_doc/_search
+{
+    "query": {
+        "bool": {
+            "must": [
+                {
+                    "match": {
+                        "my_field_1": {
+                            "query": "my_value",
+                            "_name": "my_identifier_1"
+                        }
+                    }
+                }
+            ],
+            "must_not": [
+                {
+                    "match": {
+                        "my_field_1": {
+                            "query": "my_value_2",
+                            "_name": "my_identifier_2"
+                        }
+                    }
+                }
+            ],
+            "should": [
+                {
+                    "match": {
+                        "my_field_1": {
+                            "query": "my_value_3",
+                            "_name": "my_identifier_3"
+                        }
+                    }
+                }
+            ],
+            "filter": [
+                {
+                    "range": {
+                        "my_field_2": {
+                            "lte": 15,
+                            "_name": "my_identifier_4"
+                        }
+                    }
+                },
+                {
+                    "term": {
+                        "my_field_3.keyword": "my_value"
+                    }
+                }
+            ]
+        }
+    }
+}
+
+# the two queries example 1 and 2 are the same
+# one of them should match
+
+# example 1:
+GET /<my_index_name>/_doc/_search
+{
+    "query": {
+        "match": {
+            "my_field": "my_value_1 my_value_2"
+        }
+    }
+}
+
+# example 2:
+GET /<my_index_name>/_doc/_search
+{
+    "query": {
+        "bool": {
+            "should": [
+            	{
+                	"term": {
+                    	"my_field": "my_value_1"
+                	}
+                },
+                {
+                	"term": {
+                    	"my_field": "my_value_2"
+                	}
+            	}
+            ]
+        }
+    }
 }
